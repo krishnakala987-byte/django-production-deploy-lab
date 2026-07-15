@@ -1,0 +1,15 @@
+# /etc/systemd/system/celery.service
+
+[Unit]
+Description=Celery worker
+After=network.target redis-server.service
+
+[Service]
+User=deploy
+WorkingDirectory=/srv/myapp
+EnvironmentFile=/srv/myapp/.env
+ExecStart=/srv/myapp/venv/bin/celery -A config worker -l info --concurrency=2 --max-tasks-per-child=1000
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

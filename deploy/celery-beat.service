@@ -1,0 +1,16 @@
+# /etc/systemd/system/celery-beat.service
+# Exactly ONE beat process must run — two beats would schedule every job twice.
+
+[Unit]
+Description=Celery beat scheduler
+After=network.target redis-server.service
+
+[Service]
+User=deploy
+WorkingDirectory=/srv/myapp
+EnvironmentFile=/srv/myapp/.env
+ExecStart=/srv/myapp/venv/bin/celery -A config beat -l info
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

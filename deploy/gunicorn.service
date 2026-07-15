@@ -1,0 +1,20 @@
+# /etc/systemd/system/gunicorn.service
+# Gunicorn master managing 3 Uvicorn ASGI workers, bound to a unix socket.
+# Secrets come from /srv/myapp/.env via EnvironmentFile (chmod 600).
+
+[Unit]
+Description=Gunicorn (Uvicorn ASGI workers) for myapp
+After=network.target
+
+[Service]
+User=deploy
+Group=www-data
+WorkingDirectory=/srv/myapp
+EnvironmentFile=/srv/myapp/.env
+ExecStart=/srv/myapp/venv/bin/gunicorn config.asgi:application \
+    -k uvicorn.workers.UvicornWorker -w 3 --bind unix:/run/gunicorn.sock
+ExecReload=/bin/kill -s HUP $MAINPID
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
